@@ -1,21 +1,21 @@
-# Twitter Clone
+# Chirp
 
 <img src="https://github.com/jurmadani/TwitterClone/assets/102948701/5c5383d3-df68-4dd6-9968-1bbe1179cb2e" align="left">
 
 
-This project is a Twitter clone developed using Xcode, Swift, SwiftUI, and SF Symbols. The goal of the project is to replicate key UI features of the ex-Twitter platform.
+This project is the Chirp App developed using Xcode, Swift, SwiftUI, and SF Symbols. The goal of the project is to replicate key UI features of the ex-Twitter platform.
 
 ## 🔗 Developer
 
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/daniel-jurma/)
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/j-palacio/)
 
 
 
 ## Key Features
 
-This Twitter Clone is focused on the user interface, providing a visual representation of key Twitter features. Please note that it is a UI-only project, and there is no backend or business logic implemented. The goal is to showcase the UI design and animations.
+Chirp is focused on the user interface, providing a visual representation of key Twitter features. Please note that it is a UI-only project, and there is no backend or business logic implemented. The goal is to showcase the UI design and animations.
 
-- **Twitter Splash Screen:** Engage users with a visually appealing Twitter-themed splash screen upon launching the application.
+- **ChirpTwitter Splash Screen:** Engage users with a visually appealing Twitter-themed splash screen upon launching the application.
 
 - **Sign In & Sign Up Screens:** Create a seamless user onboarding experience with dedicated screens for signing in and signing up.
 
@@ -55,13 +55,13 @@ Before running the application, ensure you have Xcode installed and follow the s
 1. Clone the repository to your local machine:
 
    ```bash
-   git clone https://github.com/your-username/twitter-clone.git
+   git clone https://github.com/j-palacio/chirp.git
      
 1. Open the Xcode project file:
 
    ```bash
-   cd twitter-clone
-   open TwitterClone.xcodeproj
+   cd chirp
+   open Chirp.xcodeproj
     
 ## Screnshots
 
@@ -126,7 +126,7 @@ These features would not only elevate the user experience but also enrich the fu
 ## Contributing
 Whether you use this project, have learned something from it, or just like it, please consider supporting it by buying me a coffee, so I can dedicate more time on building open-source projects like this :)
 
-<a href="https://www.buymeacoffee.com/djurma" target="_blank">
+<a href="https://buymeacoffee.com/jpalacio target="_blank">
   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60px" width="217px" />
 </a>
 
@@ -134,7 +134,7 @@ Whether you use this project, have learned something from it, or just like it, p
 The Twitter Clone is open-source and released under the [GNU General Public License](https://choosealicense.com/licenses/gpl-3.0/)
 
 ## Contact
-For any inquiries or questions regarding the Twitter Clone application, please contact me at d_jurma@yahoo.com
+For any inquiries or questions regarding the Chirp application, please contact me at jaypalacio95@gmail.com
 
 
 
