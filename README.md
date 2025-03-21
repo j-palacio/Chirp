@@ -1,6 +1,6 @@
 # Chirp
 
-<img src="https://github.com/jurmadani/TwitterClone/assets/102948701/5c5383d3-df68-4dd6-9968-1bbe1179cb2e" align="left">
+
 
 
 This project is the Chirp App developed using Xcode, Swift, SwiftUI, and SF Symbols. The goal of the project is to replicate key UI features of the ex-Twitter platform.
