@@ -57,6 +57,7 @@
 		1BA47C012EE3F00100A59ACC /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C052EE3F00500A59ACC /* AuthManager.swift */; };
 		1BA47C022EE3F00200A59ACC /* PostRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C062EE3F00600A59ACC /* PostRepository.swift */; };
 		1BA47C032EE3F00300A59ACC /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C072EE3F00700A59ACC /* FeedViewModel.swift */; };
+		1BA47C0A2EE4100000A59ACC /* ComposePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C0B2EE4100100A59ACC /* ComposePostView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -105,6 +106,7 @@
 		1BA47C052EE3F00500A59ACC /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		1BA47C062EE3F00600A59ACC /* PostRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostRepository.swift; sourceTree = "<group>"; };
 		1BA47C072EE3F00700A59ACC /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
+		1BA47C0B2EE4100100A59ACC /* ComposePostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposePostView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,8 +147,17 @@
 				17FB4A772B10F1B5008C68FE /* Tabs */,
 				17085EA62B0E64D700B3D092 /* Auth */,
 				17085EA32B0E63D500B3D092 /* Feed */,
+				1BA47C0C2EE4100200A59ACC /* Compose */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		1BA47C0C2EE4100200A59ACC /* Compose */ = {
+			isa = PBXGroup;
+			children = (
+				1BA47C0B2EE4100100A59ACC /* ComposePostView.swift */,
+			);
+			path = Compose;
 			sourceTree = "<group>";
 		};
 		17085EA02B0E63A300B3D092 /* Services */ = {
@@ -634,6 +645,7 @@
 				1BA47C012EE3F00100A59ACC /* AuthManager.swift in Sources */,
 				1BA47C022EE3F00200A59ACC /* PostRepository.swift in Sources */,
 				1BA47C032EE3F00300A59ACC /* FeedViewModel.swift in Sources */,
+				1BA47C0A2EE4100000A59ACC /* ComposePostView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

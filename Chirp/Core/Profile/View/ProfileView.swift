@@ -8,22 +8,40 @@
 import SwiftUI
 
 struct ProfileView: View {
-    
+    @EnvironmentObject var authManager: AuthManager
+
     @State var offset: CGFloat = 0
-    
+
     //Dark mode
     @Environment(\.colorScheme) var colorScheme
-    
+
     @State var currentTab = "Tweets"
-    
+
     //smooth slide animation
     @Namespace var animation
-    
+
     @State var titleHeaderOffset: CGFloat = 0
-    
+
     @State private var fadeInOpacity: Double = 0.0
-    
+
     @Environment(\.presentationMode) var presentationMode
+
+    // Helper to format counts
+    private func formatCount(_ count: Int) -> String {
+        if count >= 1_000_000 {
+            return String(format: "%.1fM", Double(count) / 1_000_000)
+        } else if count >= 1_000 {
+            return String(format: "%.1fK", Double(count) / 1_000)
+        }
+        return "\(count)"
+    }
+
+    // Format joined date
+    private func formatJoinedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        return "Joined \(formatter.string(from: date))"
+    }
     
     //Profile shrinking effect...
     private func getOffset() -> CGFloat{
@@ -92,30 +110,45 @@ struct ProfileView: View {
                         
                         ZStack{
                             //Banner
-                            Image("ProfileBanner")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: getRect().width, height: minY > 0 ? 150 + minY : 150, alignment: .center)
-                                .cornerRadius(0)
-                            
-                            
+                            if let bannerUrl = authManager.currentProfile?.bannerUrl,
+                               let url = URL(string: bannerUrl) {
+                                AsyncImage(url: url) { phase in
+                                    if let image = phase.image {
+                                        image
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: getRect().width, height: minY > 0 ? 150 + minY : 150, alignment: .center)
+                                            .cornerRadius(0)
+                                    } else {
+                                        Rectangle()
+                                            .fill(Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0)))
+                                            .frame(width: getRect().width, height: minY > 0 ? 150 + minY : 150, alignment: .center)
+                                    }
+                                }
+                            } else {
+                                Rectangle()
+                                    .fill(Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0)))
+                                    .frame(width: getRect().width, height: minY > 0 ? 150 + minY : 150, alignment: .center)
+                            }
+
+
                             if minY < 0 {BlurView()
                                 .opacity(blurViewOpacityNegativeY())}
                             else {BlurView()
                                 .opacity(blurViewOpacityPositiveY())}
-                            
-                            
+
+
                             //Title view
                             VStack(alignment: .leading, spacing: -1){
-                                
-                                Text("Elon Musk")
-                                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+
+                                Text(authManager.currentProfile?.fullName ?? "User")
+                                    .fontWeight(.bold)
                                     .foregroundColor(.white)
-                                
-                                
-                                Text("34.154 posts")
+
+
+                                Text("0 posts")
                                     .foregroundColor(.white)
-                                
+
                             }
                             .opacity((offset >= 0 || (-offset >= 0 && -offset <= 170)) ? 0 : (((-offset - 170) / 20) * 20) * 0.05)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -186,18 +219,35 @@ struct ProfileView: View {
                 //Profile image...
                 VStack (spacing: -5){
                     HStack{
-                        
+
                         //image
-                        Image("ProfileLogo")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 75, height: 75)
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                            .padding(5)
-                            .background(colorScheme == .dark ? Color.black : Color.white)
-                            .clipShape(Circle())
-                            .offset(y: offset < 0 ? getOffset() - 20 : -20)
-                            .scaleEffect(getScale())
+                        Group {
+                            if let avatarUrl = authManager.currentProfile?.avatarUrl,
+                               let url = URL(string: avatarUrl) {
+                                AsyncImage(url: url) { phase in
+                                    if let image = phase.image {
+                                        image
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                    } else {
+                                        Image(systemName: "person.circle.fill")
+                                            .resizable()
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            } else {
+                                Image(systemName: "person.circle.fill")
+                                    .resizable()
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        .frame(width: 75, height: 75)
+                        .clipShape(Circle())
+                        .padding(5)
+                        .background(colorScheme == .dark ? Color.black : Color.white)
+                        .clipShape(Circle())
+                        .offset(y: offset < 0 ? getOffset() - 20 : -20)
+                        .scaleEffect(getScale())
                         
                         Spacer()
                         
@@ -251,72 +301,78 @@ struct ProfileView: View {
                     
                     //Profile data
                     VStack(alignment: .leading, spacing: 5){
-                        
+
                         HStack {
                             //Full name
-                            Text("Elon Musk")
+                            Text(authManager.currentProfile?.fullName ?? "User")
                                 .font(.title2)
                                 .fontWeight(.bold)
                             //Verified badge
-                            Image("verified")
-                                .resizable()
-                                .frame(width: 23, height: 23)
-                            
+                            if authManager.currentProfile?.isVerified == true {
+                                Image(systemName: "checkmark.seal.fill")
+                                    .foregroundColor(Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0)))
+                                    .font(.title3)
+                            }
+                            //Curated voice badge
+                            if authManager.currentProfile?.isCuratedVoice == true {
+                                Image(systemName: "star.fill")
+                                    .foregroundColor(.yellow)
+                                    .font(.caption)
+                            }
+
                         }
                         //username
-                        Text("@elonmusk")
+                        Text("@\(authManager.currentProfile?.username ?? "user")")
                             .font(.callout)
                             .foregroundStyle(.secondary)
-                        
-                        Text("I'm Elon and I'm a part of Chirp 🚀")
-                        
-                        //Joined date and hobby
+
+                        // Bio
+                        if let bio = authManager.currentProfile?.bio, !bio.isEmpty {
+                            Text(bio)
+                                .padding(.top, 2)
+                        }
+
+                        //Joined date
                         HStack{
-                            //hobby
-                            Label(
-                                title: { Text("Automotive") },
-                                icon: { Image(systemName: "suitcase") }
-                            )
-                            
                             //joined date
-                            Label(
-                                title: { Text("Joined June 2009") },
-                                icon: { Image(systemName: "calendar") }
-                            )
-                            
-                            
+                            if let createdAt = authManager.currentProfile?.createdAt {
+                                Label(
+                                    title: { Text(formatJoinedDate(createdAt)) },
+                                    icon: { Image(systemName: "calendar") }
+                                )
+                            }
                         }
                         .padding(.top, 6)
                         .foregroundStyle(.secondary)
                         .font(.callout)
-                        
+
                         //User stats
                         HStack{
-                            //followers
+                            //following
                             Button{
                             } label : {
-                                
-                                Text("432")
+
+                                Text("\(authManager.currentProfile?.followingCount ?? 0)")
                                     .foregroundStyle(colorScheme == .dark ? .white : .black)
                                     .fontWeight(.semibold)
-                                
+
                                 Text("Following")
                                     .foregroundStyle(Color(.systemGray2))
-                                
+
                             }
                             //followers
                             Button{
                             } label : {
-                                Text("1.2M")
+                                Text(formatCount(authManager.currentProfile?.followerCount ?? 0))
                                     .foregroundStyle(colorScheme == .dark ? .white : .black)
                                     .fontWeight(.semibold)
                                 Text("Followers")
                                     .foregroundStyle(Color(.systemGray2))
-                                
+
                             }
                         }
-                        
-                        
+
+
                     }
                     
                     //custom segmented menu
@@ -347,4 +403,5 @@ struct ProfileView: View {
 
 #Preview {
     ProfileView()
+        .environmentObject(AuthManager())
 }
