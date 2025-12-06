@@ -47,6 +47,16 @@
 		17FB4AA42B12114B008C68FE /* MentionNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FB4AA32B12114B008C68FE /* MentionNotificationsView.swift */; };
 		17FB4AA72B121517008C68FE /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FB4AA62B121517008C68FE /* SplashView.swift */; };
 		17FB4AAA2B122FEC008C68FE /* SlideMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FB4AA92B122FEC008C68FE /* SlideMenuView.swift */; };
+		1BA47BEC2EE3E39000A59ACC /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 1BA47BEB2EE3E39000A59ACC /* Auth */; };
+		1BA47BEE2EE3E39000A59ACC /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 1BA47BED2EE3E39000A59ACC /* Functions */; };
+		1BA47BF02EE3E39000A59ACC /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 1BA47BEF2EE3E39000A59ACC /* PostgREST */; };
+		1BA47BF22EE3E39000A59ACC /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 1BA47BF12EE3E39000A59ACC /* Realtime */; };
+		1BA47BF42EE3E39000A59ACC /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 1BA47BF32EE3E39000A59ACC /* Storage */; };
+		1BA47BF72EE3EEC900A59ACC /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 1BA47BF62EE3EEC900A59ACC /* Supabase */; };
+		1BA47C002EE3F00000A59ACC /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C042EE3F00400A59ACC /* SupabaseClient.swift */; };
+		1BA47C012EE3F00100A59ACC /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C052EE3F00500A59ACC /* AuthManager.swift */; };
+		1BA47C022EE3F00200A59ACC /* PostRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C062EE3F00600A59ACC /* PostRepository.swift */; };
+		1BA47C032EE3F00300A59ACC /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C072EE3F00700A59ACC /* FeedViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -91,6 +101,10 @@
 		17FB4AA32B12114B008C68FE /* MentionNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionNotificationsView.swift; sourceTree = "<group>"; };
 		17FB4AA62B121517008C68FE /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		17FB4AA92B122FEC008C68FE /* SlideMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideMenuView.swift; sourceTree = "<group>"; };
+		1BA47C042EE3F00400A59ACC /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
+		1BA47C052EE3F00500A59ACC /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		1BA47C062EE3F00600A59ACC /* PostRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostRepository.swift; sourceTree = "<group>"; };
+		1BA47C072EE3F00700A59ACC /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +112,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1BA47BF02EE3E39000A59ACC /* PostgREST in Frameworks */,
+				1BA47BEE2EE3E39000A59ACC /* Functions in Frameworks */,
+				1BA47BF72EE3EEC900A59ACC /* Supabase in Frameworks */,
+				1BA47BEC2EE3E39000A59ACC /* Auth in Frameworks */,
+				1BA47BF42EE3E39000A59ACC /* Storage in Frameworks */,
+				1BA47BF22EE3E39000A59ACC /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,11 +149,14 @@
 			path = Core;
 			sourceTree = "<group>";
 		};
-		17085EA02B0E63A300B3D092 /* Service */ = {
+		17085EA02B0E63A300B3D092 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				1BA47C042EE3F00400A59ACC /* SupabaseClient.swift */,
+				1BA47C052EE3F00500A59ACC /* AuthManager.swift */,
+				1BA47C082EE3F00800A59ACC /* Repositories */,
 			);
-			path = Service;
+			path = Services;
 			sourceTree = "<group>";
 		};
 		17085EA12B0E63A700B3D092 /* Model */ = {
@@ -169,6 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				1725D7722B13879800BC0813 /* PostViewModel.swift */,
+				1BA47C072EE3F00700A59ACC /* FeedViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -256,6 +280,7 @@
 			isa = PBXGroup;
 			children = (
 				1763E8CE2B0BDA6600F38915 /* Chirp */,
+				1BA47BF52EE3EEC900A59ACC /* Frameworks */,
 				1763E8CD2B0BDA6600F38915 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -274,7 +299,7 @@
 				17085EA22B0E63AA00B3D092 /* Extensions */,
 				17085E9B2B0E638300B3D092 /* GlobalComponents */,
 				17085EA12B0E63A700B3D092 /* Model */,
-				17085EA02B0E63A300B3D092 /* Service */,
+				17085EA02B0E63A300B3D092 /* Services */,
 				17085E9C2B0E639200B3D092 /* Core */,
 				1763E8CF2B0BDA6600F38915 /* Chirp_app.swift */,
 				1763E8D12B0BDA6600F38915 /* ContentView.swift */,
@@ -471,6 +496,21 @@
 			path = SlideMenu;
 			sourceTree = "<group>";
 		};
+		1BA47BF52EE3EEC900A59ACC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1BA47C082EE3F00800A59ACC /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				1BA47C062EE3F00600A59ACC /* PostRepository.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -488,6 +528,12 @@
 			);
 			name = Chirp;
 			packageProductDependencies = (
+				1BA47BEB2EE3E39000A59ACC /* Auth */,
+				1BA47BED2EE3E39000A59ACC /* Functions */,
+				1BA47BEF2EE3E39000A59ACC /* PostgREST */,
+				1BA47BF12EE3E39000A59ACC /* Realtime */,
+				1BA47BF32EE3E39000A59ACC /* Storage */,
+				1BA47BF62EE3EEC900A59ACC /* Supabase */,
 			);
 			productName = "Twitter Clone";
 			productReference = 1763E8CC2B0BDA6600F38915 /* Chirp.app */;
@@ -518,6 +564,7 @@
 			);
 			mainGroup = 1763E8C32B0BDA6600F38915;
 			packageReferences = (
+				1BA47BEA2EE3E39000A59ACC /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			productRefGroup = 1763E8CD2B0BDA6600F38915 /* Products */;
 			projectDirPath = "";
@@ -583,6 +630,10 @@
 				17E6529D2B35F74F00AE555A /* CommunityCard.swift in Sources */,
 				17FB4AAA2B122FEC008C68FE /* SlideMenuView.swift in Sources */,
 				17FB4AA72B121517008C68FE /* SplashView.swift in Sources */,
+				1BA47C002EE3F00000A59ACC /* SupabaseClient.swift in Sources */,
+				1BA47C012EE3F00100A59ACC /* AuthManager.swift in Sources */,
+				1BA47C022EE3F00200A59ACC /* PostRepository.swift in Sources */,
+				1BA47C032EE3F00300A59ACC /* FeedViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -716,7 +767,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Chirp/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = WJ73377FX8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Chirp;
@@ -731,7 +782,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.danieljurma.Twitter-Clone";
+				PRODUCT_BUNDLE_IDENTIFIER = Chirp.social.media;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -747,7 +798,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Chirp/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = WJ73377FX8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Chirp;
@@ -762,7 +813,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.danieljurma.Twitter-Clone";
+				PRODUCT_BUNDLE_IDENTIFIER = Chirp.social.media;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -792,6 +843,50 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1BA47BEA2EE3E39000A59ACC /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1BA47BEB2EE3E39000A59ACC /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1BA47BEA2EE3E39000A59ACC /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		1BA47BED2EE3E39000A59ACC /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1BA47BEA2EE3E39000A59ACC /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		1BA47BEF2EE3E39000A59ACC /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1BA47BEA2EE3E39000A59ACC /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		1BA47BF12EE3E39000A59ACC /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1BA47BEA2EE3E39000A59ACC /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		1BA47BF32EE3E39000A59ACC /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1BA47BEA2EE3E39000A59ACC /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		1BA47BF62EE3EEC900A59ACC /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1BA47BEA2EE3E39000A59ACC /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1763E8C42B0BDA6600F38915 /* Project object */;
 }

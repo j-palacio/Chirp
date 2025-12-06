@@ -7,6 +7,76 @@
 
 import Foundation
 
+// MARK: - Post (from Supabase)
+
+struct Post: Codable, Identifiable {
+    let id: UUID
+    let authorId: UUID
+    let content: String
+    let imageUrl: String?
+    let likeCount: Int
+    let commentCount: Int
+    let repostCount: Int
+    let viewCount: Int
+    let isCurated: Bool
+    let moderationStatus: String
+    let createdAt: Date
+    let updatedAt: Date
+
+    // Joined author data (optional, populated when fetching with select)
+    var author: Profile?
+
+    enum CodingKeys: String, CodingKey {
+        case id, content
+        case authorId = "author_id"
+        case imageUrl = "image_url"
+        case likeCount = "like_count"
+        case commentCount = "comment_count"
+        case repostCount = "repost_count"
+        case viewCount = "view_count"
+        case isCurated = "is_curated"
+        case moderationStatus = "moderation_status"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case author = "profiles"
+    }
+
+    func relativeTimestamp() -> String {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: createdAt, to: Date())
+
+        if let years = components.year, years > 0 {
+            return "\(years)y"
+        } else if let months = components.month, months > 0 {
+            return "\(months)mo"
+        } else if let days = components.day, days > 0 {
+            return "\(days)d"
+        } else if let hours = components.hour, hours > 0 {
+            return "\(hours)h"
+        } else if let minutes = components.minute, minutes > 0 {
+            return "\(minutes)m"
+        } else {
+            return "now"
+        }
+    }
+}
+
+// MARK: - Post Insert (for creating new posts)
+
+struct PostInsert: Codable {
+    let authorId: UUID
+    let content: String
+    let imageUrl: String?
+
+    enum CodingKeys: String, CodingKey {
+        case authorId = "author_id"
+        case content
+        case imageUrl = "image_url"
+    }
+}
+
+// MARK: - Legacy PostModel (for backward compatibility)
+
 final class PostModel {
     let postId: String
     let author: UserModel
@@ -14,11 +84,11 @@ final class PostModel {
     let timestamp: Date
     var likes: Int
     var comments: [CommentModel]
-    var retweets : [RetweetModel]
-    var views : Int
+    var retweets: [RetweetModel]
+    var views: Int
     let postImage: String?
-    
-    init(postId: String, author: UserModel, content: String, timestamp: Date, likes: Int, comments: [CommentModel], retweets : [RetweetModel], views : Int, postImage: String?) {
+
+    init(postId: String, author: UserModel, content: String, timestamp: Date, likes: Int, comments: [CommentModel], retweets: [RetweetModel], views: Int, postImage: String?) {
         self.postId = postId
         self.author = author
         self.content = content
@@ -29,12 +99,28 @@ final class PostModel {
         self.views = views
         self.postImage = postImage
     }
-    
+
+    /// Create from Post
+    convenience init(from post: Post) {
+        let author = post.author.map { UserModel(from: $0) } ?? UserModel(userId: post.authorId.uuidString, username: "unknown", fullName: "Unknown")
+        self.init(
+            postId: post.id.uuidString,
+            author: author,
+            content: post.content,
+            timestamp: post.createdAt,
+            likes: post.likeCount,
+            comments: [],
+            retweets: [],
+            views: post.viewCount,
+            postImage: post.imageUrl
+        )
+    }
+
     // Computed property to calculate relative timestamp
     func relativeTimestamp() -> String {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: self.timestamp, to: Date())
-        
+
         if let years = components.year, years > 0 {
             return "\(years)y ago"
         } else if let months = components.month, months > 0 {

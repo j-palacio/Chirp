@@ -8,78 +8,89 @@
 import SwiftUI
 
 struct SlideMenuView: View {
-    
+    @EnvironmentObject var authManager: AuthManager
     @State private var appearanceTheme = false
     @Binding var showMenu : Bool
-    
+
     var body: some View {
-        
+
         VStack(alignment: .leading, spacing: 0 ){
-            
+
             //header container
             VStack(alignment: .leading, spacing: 10){
-                
-                
+
+
                 NavigationLink{
                     ProfileView()
                         .toolbar(.hidden)
-                    
+
                 } label: {
                     //user profile picture
-                    Image("ProfileLogo")
-                        .resizable()
-                        .aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
-                        .frame(width:55,height: 55)
-                        .cornerRadius(99)
+                    if let avatarUrl = authManager.currentProfile?.avatarUrl,
+                       let url = URL(string: avatarUrl) {
+                        AsyncImage(url: url) { phase in
+                            if let image = phase.image {
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 55, height: 55)
+                                    .cornerRadius(99)
+                            } else {
+                                defaultAvatar
+                            }
+                        }
+                    } else {
+                        defaultAvatar
+                    }
                 }
-                
-                
-                
+
+
+
                 //user name
-                Text("Elon Musk")
+                Text(authManager.currentProfile?.fullName ?? "User")
                     .font(.title2.bold())
-                
+
                 //user username
-                Text("@elonmusk")
+                Text("@\(authManager.currentProfile?.username ?? "user")")
                     .font(.callout)
                     .foregroundStyle(Color.gray)
-                
+
                 //user statistics (following and followers
                 HStack{
                     //following
                     Button{
-                        
+
                     } label : {
                         Label{
                             Text("Following")
                                 .foregroundStyle(Color.gray)
                         } icon: {
-                            Text("497")
+                            Text("\(authManager.currentProfile?.followingCount ?? 0)")
                                 .fontWeight(.semibold)
                         }
-                        
+
                     }
-                    
+
                     //followers
                     Button{
-                        
+
                     } label : {
                         Label{
                             Text("Followers")
                                 .foregroundStyle(Color.gray)
                         } icon: {
-                            Text("165M")
+                            Text(formatCount(authManager.currentProfile?.followerCount ?? 0))
                                 .fontWeight(.semibold)
-                            
-                            
+
+
                         }
-                        
+
                     }
-                    
+
                 }
                 .foregroundColor(.primary)
                 .font(.subheadline)
-                
+
             }
             .padding(.horizontal)
             .padding(.leading)
@@ -113,31 +124,74 @@ struct SlideMenuView: View {
                 
                 
             }
-            VStack{
-                Button{
-                    appearanceTheme.toggle()
-                } label: {
-                    Image(systemName: appearanceTheme ? "moon" : "sun.min")
-                        .imageScale(.large)
-                        .foregroundColor(.primary)
+            // Bottom section with theme toggle and logout
+            VStack(spacing: 16) {
+                Divider()
+
+                HStack {
+                    // Theme toggle
+                    Button {
+                        appearanceTheme.toggle()
+                    } label: {
+                        Image(systemName: appearanceTheme ? "moon" : "sun.min")
+                            .imageScale(.large)
+                            .foregroundColor(.primary)
+                    }
+
+                    Spacer()
+
+                    // Logout button
+                    Button {
+                        Task {
+                            try? await authManager.signOut()
+                            showMenu = false
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                            Text("Log out")
+                        }
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.red)
+                    }
                 }
             }
             .padding()
             .padding(.leading)
-            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, alignment: .leading)
-            
-            
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+
         }
         .padding(.vertical)
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(width: getRect().width - 90)
-        .frame(maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
+        .frame(maxHeight: .infinity)
         .background(
             Color.primary
                 .opacity(0.04)
                 .ignoresSafeArea(.container, edges: .vertical)
         )
-        .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Helper Views
+
+    private var defaultAvatar: some View {
+        Image(systemName: "person.circle.fill")
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(width: 55, height: 55)
+            .foregroundColor(.gray)
+    }
+
+    private func formatCount(_ count: Int) -> String {
+        if count >= 1_000_000 {
+            return String(format: "%.1fM", Double(count) / 1_000_000)
+        } else if count >= 1_000 {
+            return String(format: "%.1fK", Double(count) / 1_000)
+        }
+        return "\(count)"
     }
     
     @ViewBuilder

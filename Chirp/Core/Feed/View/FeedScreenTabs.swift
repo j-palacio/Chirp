@@ -79,4 +79,5 @@ struct TabBarItem: View {
 
 #Preview {
     FeedScreenTabs()
+        .environmentObject(AuthManager())
 }
