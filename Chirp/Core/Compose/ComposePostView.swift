@@ -13,8 +13,11 @@ struct ComposePostView: View {
 
     @State private var postContent = ""
     @State private var isPosting = false
+    @State private var isChecking = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var showModerationWarning = false
+    @State private var moderationReason = ""
 
     let onPostCreated: ((Post) -> Void)?
 
@@ -131,6 +134,11 @@ struct ComposePostView: View {
             } message: {
                 Text(errorMessage)
             }
+            .alert("Content Not Allowed", isPresented: $showModerationWarning) {
+                Button("Edit Post", role: .cancel) { }
+            } message: {
+                Text("Your post was flagged for: \(moderationReason). Please revise your content to follow community guidelines.")
+            }
         }
     }
 
@@ -148,6 +156,24 @@ struct ComposePostView: View {
 
         Task {
             do {
+                // Content moderation check
+                let moderationService = ContentModerationService.shared
+                let result = try await moderationService.analyzeContent(content)
+
+                if !result.isApproved {
+                    await MainActor.run {
+                        moderationReason = result.reason ?? "Content violates community guidelines"
+                        showModerationWarning = true
+                        isPosting = false
+                    }
+                    return
+                }
+
+                // Show warning for flagged but approved content
+                if result.shouldFlag {
+                    print("Content flagged but approved: \(result.reason ?? "unknown")")
+                }
+
                 let postRepository = PostRepository()
                 let post = try await postRepository.createPost(
                     authorId: userId,

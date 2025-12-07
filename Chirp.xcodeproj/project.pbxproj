@@ -58,6 +58,8 @@
 		1BA47C022EE3F00200A59ACC /* PostRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C062EE3F00600A59ACC /* PostRepository.swift */; };
 		1BA47C032EE3F00300A59ACC /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C072EE3F00700A59ACC /* FeedViewModel.swift */; };
 		1BA47C0A2EE4100000A59ACC /* ComposePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C0B2EE4100100A59ACC /* ComposePostView.swift */; };
+		1BA47C0C2EE4200000A59ACC /* ContentModerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C0D2EE4200100A59ACC /* ContentModerationService.swift */; };
+		1BA47C0E2EE4300000A59ACC /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C0F2EE4300100A59ACC /* PostDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -107,6 +109,8 @@
 		1BA47C062EE3F00600A59ACC /* PostRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostRepository.swift; sourceTree = "<group>"; };
 		1BA47C072EE3F00700A59ACC /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
 		1BA47C0B2EE4100100A59ACC /* ComposePostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposePostView.swift; sourceTree = "<group>"; };
+		1BA47C0D2EE4200100A59ACC /* ContentModerationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentModerationService.swift; sourceTree = "<group>"; };
+		1BA47C0F2EE4300100A59ACC /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,6 +169,7 @@
 			children = (
 				1BA47C042EE3F00400A59ACC /* SupabaseClient.swift */,
 				1BA47C052EE3F00500A59ACC /* AuthManager.swift */,
+				1BA47C0D2EE4200100A59ACC /* ContentModerationService.swift */,
 				1BA47C082EE3F00800A59ACC /* Repositories */,
 			);
 			path = Services;
@@ -216,6 +221,7 @@
 				17FB4A992B1202B2008C68FE /* ForYouFeedView.swift */,
 				17FB4A9B2B1202C6008C68FE /* FollowingFeedView.swift */,
 				17ABFEB02B14ABB700C02615 /* ScrollViewReaderFeed.swift */,
+				1BA47C0F2EE4300100A59ACC /* PostDetailView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -646,6 +652,8 @@
 				1BA47C022EE3F00200A59ACC /* PostRepository.swift in Sources */,
 				1BA47C032EE3F00300A59ACC /* FeedViewModel.swift in Sources */,
 				1BA47C0A2EE4100000A59ACC /* ComposePostView.swift in Sources */,
+				1BA47C0C2EE4200000A59ACC /* ContentModerationService.swift in Sources */,
+				1BA47C0E2EE4300000A59ACC /* PostDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

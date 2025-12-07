@@ -19,8 +19,32 @@ final class PostRepository {
             .value
     }
 
-    /// Fetch curated feed (posts from curated voices - "For You" tab)
+    /// Fetch curated feed using the algorithm (scores by priority, engagement, recency)
     func fetchCuratedFeed(limit: Int = 20, offset: Int = 0) async throws -> [Post] {
+        // First try the algorithmic feed
+        let scoredPosts: [ScoredPost] = try await supabase
+            .rpc("get_curated_feed", params: ["p_limit": limit, "p_offset": offset])
+            .execute()
+            .value
+
+        // Now fetch with profiles for each post
+        let postIds = scoredPosts.map { $0.id }
+        guard !postIds.isEmpty else { return [] }
+
+        let posts: [Post] = try await supabase
+            .from("posts")
+            .select("*, profiles(*)")
+            .in("id", values: postIds)
+            .execute()
+            .value
+
+        // Sort by the algorithm's score order
+        let postDict = Dictionary(uniqueKeysWithValues: posts.map { ($0.id, $0) })
+        return postIds.compactMap { postDict[$0] }
+    }
+
+    /// Fetch curated feed (simple version - posts from curated voices only)
+    func fetchCuratedVoicesFeed(limit: Int = 20, offset: Int = 0) async throws -> [Post] {
         try await supabase
             .from("posts")
             .select("*, profiles!inner(*)")
@@ -146,6 +170,58 @@ final class PostRepository {
             .eq("user_id", value: userId)
             .execute()
     }
+
+    func hasUserReposted(postId: UUID, userId: UUID) async throws -> Bool {
+        let reposts: [RepostRecord] = try await supabase
+            .from("reposts")
+            .select("id")
+            .eq("post_id", value: postId)
+            .eq("user_id", value: userId)
+            .execute()
+            .value
+        return !reposts.isEmpty
+    }
+
+    // MARK: - Views/Impressions
+
+    func recordView(postId: UUID, userId: UUID) async throws {
+        try await supabase
+            .rpc("record_post_view", params: ["p_post_id": postId, "p_user_id": userId])
+            .execute()
+    }
+
+    // MARK: - Comments
+
+    func fetchComments(postId: UUID, limit: Int = 50, offset: Int = 0) async throws -> [Comment] {
+        try await supabase
+            .from("comments")
+            .select("*, profiles(*)")
+            .eq("post_id", value: postId)
+            .eq("moderation_status", value: "approved")
+            .order("created_at", ascending: true)
+            .range(from: offset, to: offset + limit - 1)
+            .execute()
+            .value
+    }
+
+    func createComment(postId: UUID, authorId: UUID, content: String) async throws -> Comment {
+        let insert = CommentInsert(postId: postId, authorId: authorId, content: content)
+        return try await supabase
+            .from("comments")
+            .insert(insert)
+            .select("*, profiles(*)")
+            .single()
+            .execute()
+            .value
+    }
+
+    func deleteComment(commentId: UUID) async throws {
+        try await supabase
+            .from("comments")
+            .delete()
+            .eq("id", value: commentId)
+            .execute()
+    }
 }
 
 // MARK: - Helper Structs
@@ -179,5 +255,90 @@ struct RepostInsert: Codable {
     enum CodingKeys: String, CodingKey {
         case userId = "user_id"
         case postId = "post_id"
+    }
+}
+
+struct RepostRecord: Codable {
+    let id: UUID
+}
+
+struct CommentInsert: Codable {
+    let postId: UUID
+    let authorId: UUID
+    let content: String
+
+    enum CodingKeys: String, CodingKey {
+        case postId = "post_id"
+        case authorId = "author_id"
+        case content
+    }
+}
+
+struct Comment: Codable, Identifiable {
+    let id: UUID
+    let postId: UUID
+    let authorId: UUID
+    let content: String
+    let moderationStatus: String
+    let createdAt: Date
+    var author: Profile?
+
+    enum CodingKeys: String, CodingKey {
+        case id, content
+        case postId = "post_id"
+        case authorId = "author_id"
+        case moderationStatus = "moderation_status"
+        case createdAt = "created_at"
+        case author = "profiles"
+    }
+
+    func relativeTimestamp() -> String {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: createdAt, to: Date())
+
+        if let years = components.year, years > 0 {
+            return "\(years)y"
+        } else if let months = components.month, months > 0 {
+            return "\(months)mo"
+        } else if let days = components.day, days > 0 {
+            return "\(days)d"
+        } else if let hours = components.hour, hours > 0 {
+            return "\(hours)h"
+        } else if let minutes = components.minute, minutes > 0 {
+            return "\(minutes)m"
+        } else {
+            return "now"
+        }
+    }
+}
+
+struct ScoredPost: Codable {
+    let id: UUID
+    let authorId: UUID
+    let content: String
+    let imageUrl: String?
+    let likeCount: Int
+    let commentCount: Int
+    let repostCount: Int
+    let viewCount: Int
+    let isCurated: Bool
+    let moderationStatus: String
+    let createdAt: Date
+    let updatedAt: Date
+    let feedScore: Double
+
+    enum CodingKeys: String, CodingKey {
+        case id, content
+        case authorId = "author_id"
+        case imageUrl = "image_url"
+        case likeCount = "like_count"
+        case commentCount = "comment_count"
+        case repostCount = "repost_count"
+        case viewCount = "view_count"
+        case isCurated = "is_curated"
+        case moderationStatus = "moderation_status"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case feedScore = "feed_score"
     }
 }

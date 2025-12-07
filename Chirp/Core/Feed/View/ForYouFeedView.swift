@@ -142,6 +142,28 @@ struct FeedScrollView: View {
 
 struct PostRowView: View {
     let post: Post
+    @EnvironmentObject var authManager: AuthManager
+
+    @State private var isLiked = false
+    @State private var isReposted = false
+    @State private var likeCount: Int
+    @State private var repostCount: Int
+    @State private var viewCount: Int
+    @State private var commentCount: Int
+    @State private var isProcessing = false
+    @State private var showPostDetail = false
+    @State private var hasRecordedView = false
+
+    private let postRepository = PostRepository()
+    private let twitterBlue = Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0))
+
+    init(post: Post) {
+        self.post = post
+        _likeCount = State(initialValue: post.likeCount)
+        _repostCount = State(initialValue: post.repostCount)
+        _viewCount = State(initialValue: post.viewCount)
+        _commentCount = State(initialValue: post.commentCount)
+    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
@@ -178,7 +200,7 @@ struct PostRowView: View {
                         // Verified badge
                         if post.author?.isVerified == true {
                             Image(systemName: "checkmark.seal.fill")
-                                .foregroundColor(Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0)))
+                                .foregroundColor(twitterBlue)
                                 .font(.caption)
                         }
 
@@ -228,32 +250,123 @@ struct PostRowView: View {
                 // Post actions
                 HStack(spacing: 20) {
                     // Comments
-                    Button {} label: {
-                        Label(formatCount(post.commentCount), systemImage: "bubble")
+                    Button {
+                        showPostDetail = true
+                    } label: {
+                        Label(formatCount(commentCount), systemImage: "bubble")
                     }
+                    .foregroundColor(.secondary)
 
                     // Reposts
-                    Button {} label: {
-                        Label(formatCount(post.repostCount), systemImage: "arrow.2.squarepath")
+                    Button {
+                        toggleRepost()
+                    } label: {
+                        Label(formatCount(repostCount), systemImage: "arrow.2.squarepath")
                     }
+                    .foregroundColor(isReposted ? .green : .secondary)
 
                     // Likes
-                    Button {} label: {
-                        Label(formatCount(post.likeCount), systemImage: "heart")
+                    Button {
+                        toggleLike()
+                    } label: {
+                        Label(formatCount(likeCount), systemImage: isLiked ? "heart.fill" : "heart")
                     }
+                    .foregroundColor(isLiked ? .red : .secondary)
 
                     // Views
-                    Button {} label: {
-                        Label(formatCount(post.viewCount), systemImage: "chart.bar.fill")
-                    }
+                    Label(formatCount(viewCount), systemImage: "chart.bar.fill")
+                        .foregroundColor(.secondary)
                 }
-                .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.callout)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
+        .contentShape(Rectangle())
+        .onTapGesture {
+            showPostDetail = true
+        }
+        .task {
+            await checkUserInteractions()
+            await recordView()
+        }
+        .sheet(isPresented: $showPostDetail) {
+            PostDetailView(post: post, commentCount: $commentCount)
+        }
+    }
+
+    private func recordView() async {
+        guard !hasRecordedView, let userId = authManager.currentUser?.id else { return }
+        hasRecordedView = true
+
+        do {
+            try await postRepository.recordView(postId: post.id, userId: userId)
+            viewCount += 1
+        } catch {
+            print("Error recording view: \(error)")
+        }
+    }
+
+    private func checkUserInteractions() async {
+        guard let userId = authManager.currentUser?.id else { return }
+
+        do {
+            isLiked = try await postRepository.hasUserLikedPost(postId: post.id, userId: userId)
+            isReposted = try await postRepository.hasUserReposted(postId: post.id, userId: userId)
+        } catch {
+            print("Error checking interactions: \(error)")
+        }
+    }
+
+    private func toggleLike() {
+        guard !isProcessing, let userId = authManager.currentUser?.id else { return }
+        isProcessing = true
+
+        // Optimistic update
+        isLiked.toggle()
+        likeCount += isLiked ? 1 : -1
+
+        Task {
+            do {
+                if isLiked {
+                    try await postRepository.likePost(postId: post.id, userId: userId)
+                } else {
+                    try await postRepository.unlikePost(postId: post.id, userId: userId)
+                }
+            } catch {
+                // Revert on error
+                isLiked.toggle()
+                likeCount += isLiked ? 1 : -1
+                print("Error toggling like: \(error)")
+            }
+            isProcessing = false
+        }
+    }
+
+    private func toggleRepost() {
+        guard !isProcessing, let userId = authManager.currentUser?.id else { return }
+        isProcessing = true
+
+        // Optimistic update
+        isReposted.toggle()
+        repostCount += isReposted ? 1 : -1
+
+        Task {
+            do {
+                if isReposted {
+                    try await postRepository.repost(postId: post.id, userId: userId)
+                } else {
+                    try await postRepository.unrepost(postId: post.id, userId: userId)
+                }
+            } catch {
+                // Revert on error
+                isReposted.toggle()
+                repostCount += isReposted ? 1 : -1
+                print("Error toggling repost: \(error)")
+            }
+            isProcessing = false
+        }
     }
 
     private func formatCount(_ count: Int) -> String {
