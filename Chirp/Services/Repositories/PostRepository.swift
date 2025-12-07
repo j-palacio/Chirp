@@ -222,6 +222,91 @@ final class PostRepository {
             .eq("id", value: commentId)
             .execute()
     }
+
+    // MARK: - Reporting
+
+    func reportPost(postId: UUID, reporterId: UUID, reason: ReportReason, description: String?) async throws {
+        let report = ReportInsert(
+            reporterId: reporterId,
+            reportedPostId: postId,
+            reportedUserId: nil,
+            reportedCommentId: nil,
+            reason: reason.rawValue,
+            description: description
+        )
+        try await supabase.from("content_reports").insert(report).execute()
+    }
+
+    func reportUser(userId: UUID, reporterId: UUID, reason: ReportReason, description: String?) async throws {
+        let report = ReportInsert(
+            reporterId: reporterId,
+            reportedPostId: nil,
+            reportedUserId: userId,
+            reportedCommentId: nil,
+            reason: reason.rawValue,
+            description: description
+        )
+        try await supabase.from("content_reports").insert(report).execute()
+    }
+
+    func reportComment(commentId: UUID, reporterId: UUID, reason: ReportReason, description: String?) async throws {
+        let report = ReportInsert(
+            reporterId: reporterId,
+            reportedPostId: nil,
+            reportedUserId: nil,
+            reportedCommentId: commentId,
+            reason: reason.rawValue,
+            description: description
+        )
+        try await supabase.from("content_reports").insert(report).execute()
+    }
+
+    // MARK: - Follow/Unfollow
+
+    func followUser(followerId: UUID, followingId: UUID) async throws {
+        let follow = FollowInsert(followerId: followerId, followingId: followingId)
+        try await supabase.from("follows").insert(follow).execute()
+    }
+
+    func unfollowUser(followerId: UUID, followingId: UUID) async throws {
+        try await supabase
+            .from("follows")
+            .delete()
+            .eq("follower_id", value: followerId)
+            .eq("following_id", value: followingId)
+            .execute()
+    }
+
+    func isFollowing(followerId: UUID, followingId: UUID) async throws -> Bool {
+        let follows: [FollowRecord] = try await supabase
+            .from("follows")
+            .select("following_id")
+            .eq("follower_id", value: followerId)
+            .eq("following_id", value: followingId)
+            .execute()
+            .value
+        return !follows.isEmpty
+    }
+
+    func fetchFollowers(userId: UUID) async throws -> [Profile] {
+        let follows: [FollowWithProfile] = try await supabase
+            .from("follows")
+            .select("follower_id, profiles!follows_follower_id_fkey(*)")
+            .eq("following_id", value: userId)
+            .execute()
+            .value
+        return follows.compactMap { $0.profile }
+    }
+
+    func fetchFollowing(userId: UUID) async throws -> [Profile] {
+        let follows: [FollowingWithProfile] = try await supabase
+            .from("follows")
+            .select("following_id, profiles!follows_following_id_fkey(*)")
+            .eq("follower_id", value: userId)
+            .execute()
+            .value
+        return follows.compactMap { $0.profile }
+    }
 }
 
 // MARK: - Helper Structs
@@ -340,5 +425,87 @@ struct ScoredPost: Codable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case feedScore = "feed_score"
+    }
+}
+
+// MARK: - Report Types
+
+enum ReportReason: String, CaseIterable {
+    case harassment = "harassment"
+    case hatespeech = "hate_speech"
+    case identityThreat = "identity_threat"
+    case spam = "spam"
+    case misinformation = "misinformation"
+    case other = "other"
+
+    var displayName: String {
+        switch self {
+        case .harassment: return "Harassment"
+        case .hatespeech: return "Hate Speech"
+        case .identityThreat: return "Identity-based Threat"
+        case .spam: return "Spam"
+        case .misinformation: return "Misinformation"
+        case .other: return "Other"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .harassment: return "Targeted harassment or bullying"
+        case .hatespeech: return "Hateful content based on protected characteristics"
+        case .identityThreat: return "Threats based on race, religion, gender, etc."
+        case .spam: return "Spam, scams, or misleading links"
+        case .misinformation: return "False or misleading information"
+        case .other: return "Other violation of community guidelines"
+        }
+    }
+}
+
+struct ReportInsert: Codable {
+    let reporterId: UUID
+    let reportedPostId: UUID?
+    let reportedUserId: UUID?
+    let reportedCommentId: UUID?
+    let reason: String
+    let description: String?
+
+    enum CodingKeys: String, CodingKey {
+        case reporterId = "reporter_id"
+        case reportedPostId = "reported_post_id"
+        case reportedUserId = "reported_user_id"
+        case reportedCommentId = "reported_comment_id"
+        case reason, description
+    }
+}
+
+// MARK: - Follow Types
+
+struct FollowInsert: Codable {
+    let followerId: UUID
+    let followingId: UUID
+
+    enum CodingKeys: String, CodingKey {
+        case followerId = "follower_id"
+        case followingId = "following_id"
+    }
+}
+
+struct FollowWithProfile: Codable {
+    let followerId: UUID
+    let profile: Profile?
+
+    enum CodingKeys: String, CodingKey {
+        case followerId = "follower_id"
+        case profile = "profiles"
+    }
+}
+
+struct FollowingWithProfile: Codable {
+    let followingId: UUID
+    let profile: Profile?
+
+    enum CodingKeys: String, CodingKey {
+        case followingId = "following_id"
+        case profile = "profiles"
     }
 }

@@ -60,6 +60,7 @@
 		1BA47C0A2EE4100000A59ACC /* ComposePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C0B2EE4100100A59ACC /* ComposePostView.swift */; };
 		1BA47C0C2EE4200000A59ACC /* ContentModerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C0D2EE4200100A59ACC /* ContentModerationService.swift */; };
 		1BA47C0E2EE4300000A59ACC /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C0F2EE4300100A59ACC /* PostDetailView.swift */; };
+		1BA47C102EE4400000A59ACC /* ReportSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA47C112EE4400100A59ACC /* ReportSheetView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -111,6 +112,7 @@
 		1BA47C0B2EE4100100A59ACC /* ComposePostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposePostView.swift; sourceTree = "<group>"; };
 		1BA47C0D2EE4200100A59ACC /* ContentModerationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentModerationService.swift; sourceTree = "<group>"; };
 		1BA47C0F2EE4300100A59ACC /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
+		1BA47C112EE4400100A59ACC /* ReportSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSheetView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				17FB4A732B10AB81008C68FE /* TwitterLogo.swift */,
+				1BA47C112EE4400100A59ACC /* ReportSheetView.swift */,
 			);
 			path = GlobalComponents;
 			sourceTree = "<group>";
@@ -654,6 +657,7 @@
 				1BA47C0A2EE4100000A59ACC /* ComposePostView.swift in Sources */,
 				1BA47C0C2EE4200000A59ACC /* ContentModerationService.swift in Sources */,
 				1BA47C0E2EE4300000A59ACC /* PostDetailView.swift in Sources */,
+				1BA47C102EE4400000A59ACC /* ReportSheetView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

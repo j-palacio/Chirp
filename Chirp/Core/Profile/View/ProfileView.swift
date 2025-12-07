@@ -10,6 +10,9 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var authManager: AuthManager
 
+    // Optional: profile to display (if nil, shows current user)
+    var profileToShow: Profile?
+
     @State var offset: CGFloat = 0
 
     //Dark mode
@@ -23,8 +26,26 @@ struct ProfileView: View {
     @State var titleHeaderOffset: CGFloat = 0
 
     @State private var fadeInOpacity: Double = 0.0
+    @State private var isFollowing = false
+    @State private var isProcessingFollow = false
+    @State private var followerCount: Int = 0
 
     @Environment(\.presentationMode) var presentationMode
+
+    private let postRepository = PostRepository()
+    private let twitterBlue = Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0))
+
+    // The profile being displayed (either profileToShow or currentProfile)
+    private var displayProfile: Profile? {
+        profileToShow ?? authManager.currentProfile
+    }
+
+    // Check if viewing own profile
+    private var isOwnProfile: Bool {
+        guard let displayId = displayProfile?.id,
+              let currentId = authManager.currentUser?.id else { return true }
+        return displayId == currentId
+    }
 
     // Helper to format counts
     private func formatCount(_ count: Int) -> String {
@@ -110,7 +131,7 @@ struct ProfileView: View {
                         
                         ZStack{
                             //Banner
-                            if let bannerUrl = authManager.currentProfile?.bannerUrl,
+                            if let bannerUrl = displayProfile?.bannerUrl,
                                let url = URL(string: bannerUrl) {
                                 AsyncImage(url: url) { phase in
                                     if let image = phase.image {
@@ -121,13 +142,13 @@ struct ProfileView: View {
                                             .cornerRadius(0)
                                     } else {
                                         Rectangle()
-                                            .fill(Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0)))
+                                            .fill(twitterBlue)
                                             .frame(width: getRect().width, height: minY > 0 ? 150 + minY : 150, alignment: .center)
                                     }
                                 }
                             } else {
                                 Rectangle()
-                                    .fill(Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0)))
+                                    .fill(twitterBlue)
                                     .frame(width: getRect().width, height: minY > 0 ? 150 + minY : 150, alignment: .center)
                             }
 
@@ -141,7 +162,7 @@ struct ProfileView: View {
                             //Title view
                             VStack(alignment: .leading, spacing: -1){
 
-                                Text(authManager.currentProfile?.fullName ?? "User")
+                                Text(displayProfile?.fullName ?? "User")
                                     .fontWeight(.bold)
                                     .foregroundColor(.white)
 
@@ -222,7 +243,7 @@ struct ProfileView: View {
 
                         //image
                         Group {
-                            if let avatarUrl = authManager.currentProfile?.avatarUrl,
+                            if let avatarUrl = displayProfile?.avatarUrl,
                                let url = URL(string: avatarUrl) {
                                 AsyncImage(url: url) { phase in
                                     if let image = phase.image {
@@ -248,54 +269,50 @@ struct ProfileView: View {
                         .clipShape(Circle())
                         .offset(y: offset < 0 ? getOffset() - 20 : -20)
                         .scaleEffect(getScale())
-                        
+
                         Spacer()
-                        
-                        
-                        //notifications button
-                        Button{
-                        } label : {
-                            HStack{
-                                Image(systemName: "bell.badge")
-                                    .tint(.primary)
-                                    .padding(8)
+
+                        if isOwnProfile {
+                            // Edit profile button for own profile
+                            Button {
+                                // TODO: Edit profile action
+                            } label: {
+                                Text("Edit profile")
+                                    .fontWeight(.semibold)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .foregroundColor(.primary)
+                                    .background(
+                                        Capsule()
+                                            .stroke(Color(.systemGray3), lineWidth: 1)
+                                    )
                             }
-                            .background(
-                                Circle()
-                                    .stroke(Color(.systemGray2))
-                            )
-                        }
-                        
-                        //follow button
-                        Button{
-                        } label : {
-                            HStack{
-                                Image(systemName: "person.fill.checkmark")
-                                    .tint(.primary)
-                                    .padding(8)
+                        } else {
+                            // Follow/Unfollow button for other users
+                            Button {
+                                toggleFollow()
+                            } label: {
+                                if isProcessingFollow {
+                                    ProgressView()
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 8)
+                                } else {
+                                    Text(isFollowing ? "Following" : "Follow")
+                                        .fontWeight(.semibold)
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 8)
+                                        .foregroundColor(isFollowing ? .primary : .white)
+                                        .background(isFollowing ? Color.clear : twitterBlue)
+                                        .background(
+                                            Capsule()
+                                                .stroke(isFollowing ? Color(.systemGray3) : Color.clear, lineWidth: 1)
+                                        )
+                                        .clipShape(Capsule())
+                                }
                             }
-                            .background(
-                                Circle()
-                                    .stroke(Color(.systemGray2))
-                            )
+                            .disabled(isProcessingFollow)
                         }
-                        
-                        //subscribe button
-                        Button{
-                        } label : {
-                            HStack{
-                                Text("Subscribe")
-                                    .fontWeight(.bold)
-                                    .padding(10)
-                                    .padding(.leading, 10)
-                                    .padding(.trailing, 10)
-                                    .foregroundStyle(.white)
-                                
-                            }
-                            .background(Color(red: 201/255, green: 54/255, blue: 204/255))
-                            .cornerRadius(99)
-                        }
-                        
+
                     }
                     .padding(.top, -18)
                     
@@ -304,17 +321,17 @@ struct ProfileView: View {
 
                         HStack {
                             //Full name
-                            Text(authManager.currentProfile?.fullName ?? "User")
+                            Text(displayProfile?.fullName ?? "User")
                                 .font(.title2)
                                 .fontWeight(.bold)
                             //Verified badge
-                            if authManager.currentProfile?.isVerified == true {
+                            if displayProfile?.isVerified == true {
                                 Image(systemName: "checkmark.seal.fill")
-                                    .foregroundColor(Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0)))
+                                    .foregroundColor(twitterBlue)
                                     .font(.title3)
                             }
                             //Curated voice badge
-                            if authManager.currentProfile?.isCuratedVoice == true {
+                            if displayProfile?.isCuratedVoice == true {
                                 Image(systemName: "star.fill")
                                     .foregroundColor(.yellow)
                                     .font(.caption)
@@ -322,12 +339,12 @@ struct ProfileView: View {
 
                         }
                         //username
-                        Text("@\(authManager.currentProfile?.username ?? "user")")
+                        Text("@\(displayProfile?.username ?? "user")")
                             .font(.callout)
                             .foregroundStyle(.secondary)
 
                         // Bio
-                        if let bio = authManager.currentProfile?.bio, !bio.isEmpty {
+                        if let bio = displayProfile?.bio, !bio.isEmpty {
                             Text(bio)
                                 .padding(.top, 2)
                         }
@@ -335,7 +352,7 @@ struct ProfileView: View {
                         //Joined date
                         HStack{
                             //joined date
-                            if let createdAt = authManager.currentProfile?.createdAt {
+                            if let createdAt = displayProfile?.createdAt {
                                 Label(
                                     title: { Text(formatJoinedDate(createdAt)) },
                                     icon: { Image(systemName: "calendar") }
@@ -352,7 +369,7 @@ struct ProfileView: View {
                             Button{
                             } label : {
 
-                                Text("\(authManager.currentProfile?.followingCount ?? 0)")
+                                Text("\(displayProfile?.followingCount ?? 0)")
                                     .foregroundStyle(colorScheme == .dark ? .white : .black)
                                     .fontWeight(.semibold)
 
@@ -363,7 +380,7 @@ struct ProfileView: View {
                             //followers
                             Button{
                             } label : {
-                                Text(formatCount(authManager.currentProfile?.followerCount ?? 0))
+                                Text(formatCount(followerCount))
                                     .foregroundStyle(colorScheme == .dark ? .white : .black)
                                     .fontWeight(.semibold)
                                 Text("Followers")
@@ -395,10 +412,57 @@ struct ProfileView: View {
             }
         })
         .ignoresSafeArea(.all, edges: .top)
+        .task {
+            await checkFollowStatus()
+            initializeFollowerCount()
+        }
     }
-    
-    
-    
+
+    // MARK: - Follow Actions
+
+    private func initializeFollowerCount() {
+        followerCount = displayProfile?.followerCount ?? 0
+    }
+
+    private func checkFollowStatus() async {
+        guard !isOwnProfile,
+              let currentUserId = authManager.currentUser?.id,
+              let profileId = displayProfile?.id else { return }
+
+        do {
+            isFollowing = try await postRepository.isFollowing(followerId: currentUserId, followingId: profileId)
+        } catch {
+            print("Error checking follow status: \(error)")
+        }
+    }
+
+    private func toggleFollow() {
+        guard !isProcessingFollow,
+              let currentUserId = authManager.currentUser?.id,
+              let profileId = displayProfile?.id else { return }
+
+        isProcessingFollow = true
+
+        // Optimistic update
+        isFollowing.toggle()
+        followerCount += isFollowing ? 1 : -1
+
+        Task {
+            do {
+                if isFollowing {
+                    try await postRepository.followUser(followerId: currentUserId, followingId: profileId)
+                } else {
+                    try await postRepository.unfollowUser(followerId: currentUserId, followingId: profileId)
+                }
+            } catch {
+                // Revert on error
+                isFollowing.toggle()
+                followerCount += isFollowing ? 1 : -1
+                print("Error toggling follow: \(error)")
+            }
+            isProcessingFollow = false
+        }
+    }
 }
 
 #Preview {

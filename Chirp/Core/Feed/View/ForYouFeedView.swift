@@ -153,6 +153,8 @@ struct PostRowView: View {
     @State private var isProcessing = false
     @State private var showPostDetail = false
     @State private var hasRecordedView = false
+    @State private var showReportSheet = false
+    @State private var showProfile = false
 
     private let postRepository = PostRepository()
     private let twitterBlue = Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0))
@@ -167,21 +169,25 @@ struct PostRowView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            // User avatar
-            AsyncImage(url: URL(string: post.author?.avatarUrl ?? "https://i.pravatar.cc/48")) { phase in
-                if let image = phase.image {
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 48, height: 48)
-                        .cornerRadius(99)
-                } else if phase.error != nil {
-                    Circle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 48, height: 48)
-                } else {
-                    ProgressView()
-                        .frame(width: 48, height: 48)
+            // User avatar - tappable to view profile
+            Button {
+                showProfile = true
+            } label: {
+                AsyncImage(url: URL(string: post.author?.avatarUrl ?? "https://i.pravatar.cc/48")) { phase in
+                    if let image = phase.image {
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 48, height: 48)
+                            .cornerRadius(99)
+                    } else if phase.error != nil {
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 48, height: 48)
+                    } else {
+                        ProgressView()
+                            .frame(width: 48, height: 48)
+                    }
                 }
             }
 
@@ -189,9 +195,14 @@ struct PostRowView: View {
             VStack(alignment: .leading, spacing: 5) {
                 // Post author information
                 HStack {
-                    // Author name
-                    Text(post.author?.fullName ?? "Unknown")
-                        .fontWeight(.bold)
+                    // Author name - tappable to view profile
+                    Button {
+                        showProfile = true
+                    } label: {
+                        Text(post.author?.fullName ?? "Unknown")
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
 
                     HStack(spacing: 2) {
                         // Username
@@ -221,7 +232,13 @@ struct PostRowView: View {
 
                     Spacer()
 
-                    Button {} label: {
+                    Menu {
+                        Button(role: .destructive) {
+                            showReportSheet = true
+                        } label: {
+                            Label("Report Post", systemImage: "flag")
+                        }
+                    } label: {
                         Image(systemName: "ellipsis")
                             .tint(.secondary)
                     }
@@ -294,6 +311,17 @@ struct PostRowView: View {
         .sheet(isPresented: $showPostDetail) {
             PostDetailView(post: post, commentCount: $commentCount)
         }
+        .sheet(isPresented: $showReportSheet) {
+            if let userId = authManager.currentUser?.id {
+                ReportSheetView(postId: post.id, userId: nil, commentId: nil, reporterId: userId)
+            }
+        }
+        .sheet(isPresented: $showProfile) {
+            if let author = post.author {
+                ProfileView(profileToShow: author)
+                    .environmentObject(authManager)
+            }
+        }
     }
 
     private func recordView() async {
@@ -301,8 +329,9 @@ struct PostRowView: View {
         hasRecordedView = true
 
         do {
+            // Record view - the database function handles deduplication
+            // Don't do optimistic update since the DB function only increments once per user
             try await postRepository.recordView(postId: post.id, userId: userId)
-            viewCount += 1
         } catch {
             print("Error recording view: \(error)")
         }
