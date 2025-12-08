@@ -12,21 +12,22 @@ struct ViewHeader: View {
     var view : String
     @State var searchText : String = ""
     @Binding var showMenu : Bool
+    @EnvironmentObject var authManager: AuthManager
 
     var body: some View {
-        
+
         ZStack{
-        
-        
+
+
             //avatar image
-            AsyncImage(url: URL(string: "https://ichef.bbci.co.uk/news/976/cpsprodpb/1777E/production/_127462169_gettyimages-1438052890.jpg")) { phase in
+            AsyncImage(url: URL(string: authManager.currentProfile?.avatarUrl ?? "")) { phase in
                 if let image = phase.image {
                     image
                         .resizable()
                         .aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
                         .frame(width:32,height: 32)
                         .cornerRadius(99)
-                    
+
                 } else if phase.error != nil {
                     Color.red // Indicates an error.
                 } else {

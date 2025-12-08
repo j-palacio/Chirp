@@ -29,15 +29,18 @@ struct ProfileView: View {
     @State private var isFollowing = false
     @State private var isProcessingFollow = false
     @State private var followerCount: Int = 0
+    @State private var showEditProfile = false
+    @State private var fetchedProfile: Profile?
 
     @Environment(\.presentationMode) var presentationMode
 
     private let postRepository = PostRepository()
+    private let profileRepository = ProfileRepository()
     private let twitterBlue = Color(UIColor(red: 29/255, green: 161/255, blue: 242/255, alpha: 1.0))
 
-    // The profile being displayed (either profileToShow or currentProfile)
+    // The profile being displayed (fetched fresh, or fallback to passed/current)
     private var displayProfile: Profile? {
-        profileToShow ?? authManager.currentProfile
+        fetchedProfile ?? profileToShow ?? authManager.currentProfile
     }
 
     // Check if viewing own profile
@@ -275,7 +278,7 @@ struct ProfileView: View {
                         if isOwnProfile {
                             // Edit profile button for own profile
                             Button {
-                                // TODO: Edit profile action
+                                showEditProfile = true
                             } label: {
                                 Text("Edit profile")
                                     .fontWeight(.semibold)
@@ -413,8 +416,36 @@ struct ProfileView: View {
         })
         .ignoresSafeArea(.all, edges: .top)
         .task {
+            await fetchFreshProfile()
             await checkFollowStatus()
             initializeFollowerCount()
+        }
+        .sheet(isPresented: $showEditProfile) {
+            EditProfileView()
+                .environmentObject(authManager)
+        }
+    }
+
+    // MARK: - Profile Loading
+
+    private func fetchFreshProfile() async {
+        // Get the profile ID to fetch
+        let profileId: UUID?
+        if let passedProfile = profileToShow {
+            profileId = passedProfile.id
+        } else if let currentId = authManager.currentUser?.id {
+            profileId = currentId
+        } else {
+            profileId = nil
+        }
+
+        guard let id = profileId else { return }
+
+        do {
+            let fresh = try await profileRepository.fetchProfile(userId: id)
+            fetchedProfile = fresh
+        } catch {
+            print("Error fetching fresh profile: \(error)")
         }
     }
 

@@ -152,6 +152,10 @@ struct ReportSheetView: View {
 
     private func submitReport() {
         guard let reason = selectedReason else { return }
+        guard postId != nil || userId != nil || commentId != nil else {
+            errorMessage = "Nothing to report."
+            return
+        }
         isSubmitting = true
         errorMessage = nil
 
