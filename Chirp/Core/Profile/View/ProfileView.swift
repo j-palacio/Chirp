@@ -31,6 +31,8 @@ struct ProfileView: View {
     @State private var followerCount: Int = 0
     @State private var showEditProfile = false
     @State private var fetchedProfile: Profile?
+    @State private var userPosts: [Post] = []
+    @State private var isLoadingPosts = false
 
     @Environment(\.presentationMode) var presentationMode
 
@@ -398,14 +400,28 @@ struct ProfileView: View {
                     //custom segmented menu
                     CustomTabsBar(currentTab: $currentTab, animation: animation)
                     
-                    VStack{
-                        ForEach(profileTweetsMockData, id: \.postId) { post in
-                            ProfilePostViewModel(post: post)
-                            Divider()
+                    VStack {
+                        if isLoadingPosts {
+                            ProgressView()
+                                .padding(.top, 40)
+                        } else if userPosts.isEmpty {
+                            VStack(spacing: 12) {
+                                Text("No posts yet")
+                                    .font(.headline)
+                                    .foregroundColor(.secondary)
+                                Text(isOwnProfile ? "Share your first post!" : "This user hasn't posted yet.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.top, 40)
+                        } else {
+                            ForEach(userPosts) { post in
+                                PostRowView(post: post)
+                                Divider()
+                            }
                         }
                     }
-                    .animation(.bouncy)
-                    .padding(.top, 25)
+                    .padding(.top, 10)
                     .zIndex(0)
                     
                 }
@@ -418,6 +434,7 @@ struct ProfileView: View {
         .task {
             await fetchFreshProfile()
             await checkFollowStatus()
+            await fetchUserPosts()
             initializeFollowerCount()
         }
         .sheet(isPresented: $showEditProfile) {
@@ -447,6 +464,18 @@ struct ProfileView: View {
         } catch {
             print("Error fetching fresh profile: \(error)")
         }
+    }
+
+    private func fetchUserPosts() async {
+        guard let profileId = displayProfile?.id else { return }
+
+        isLoadingPosts = true
+        do {
+            userPosts = try await postRepository.fetchUserPosts(userId: profileId)
+        } catch {
+            print("Error fetching user posts: \(error)")
+        }
+        isLoadingPosts = false
     }
 
     // MARK: - Follow Actions
@@ -485,6 +514,8 @@ struct ProfileView: View {
                 } else {
                     try await postRepository.unfollowUser(followerId: currentUserId, followingId: profileId)
                 }
+                // Refresh current user's profile to update following count
+                await authManager.fetchProfile()
             } catch {
                 // Revert on error
                 isFollowing.toggle()

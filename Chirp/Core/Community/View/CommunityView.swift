@@ -14,7 +14,7 @@ struct CommunityView: View {
     var body: some View {
         VStack(alignment: .center) {
             //header
-            ViewHeader(view: "community", showMenu: $showMenu)
+            ViewHeader(view: "community", searchText: .constant(""), showMenu: $showMenu)
             Divider()
             //communities
             ScrollView{

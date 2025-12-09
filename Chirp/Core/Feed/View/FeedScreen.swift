@@ -13,7 +13,7 @@ struct FeedScreen: View {
     var body: some View {
         VStack(alignment: .center) {
             //header
-            ViewHeader(view: "feed", showMenu: $showMenu)
+            ViewHeader(view: "feed", searchText: .constant(""), showMenu: $showMenu)
 
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }

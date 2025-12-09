@@ -14,7 +14,7 @@ struct NotificationsView: View {
     var body: some View {
         VStack(alignment: .center) {
             //header
-            ViewHeader(view: "notification", showMenu: $showMenu)
+            ViewHeader(view: "notification", searchText: .constant(""), showMenu: $showMenu)
             Divider()
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }

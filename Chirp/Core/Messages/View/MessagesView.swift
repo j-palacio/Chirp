@@ -14,7 +14,7 @@ struct MessagesView: View {
     var body: some View {
         VStack(alignment: .center) {
             //header
-            ViewHeader(view: "messages", showMenu: $showMenu)
+            ViewHeader(view: "messages", searchText: .constant(""), showMenu: $showMenu)
             Divider()
             //messages posts
             ScrollView{

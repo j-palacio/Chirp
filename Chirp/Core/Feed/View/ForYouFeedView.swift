@@ -109,7 +109,7 @@ struct FeedScrollView: View {
                     }
                 )
             }
-            .padding(.top, 50)
+            .padding(.top, 5)
             .refreshable {
                 onRefresh()
             }

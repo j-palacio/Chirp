@@ -10,7 +10,7 @@ import SwiftUI
 struct ViewHeader: View {
     //params for this component
     var view : String
-    @State var searchText : String = ""
+    @Binding var searchText: String
     @Binding var showMenu : Bool
     @EnvironmentObject var authManager: AuthManager
 
@@ -85,12 +85,6 @@ struct ViewHeader: View {
             switch view {
             case "feed":
                 FeedScreenTabs()
-            case "search":
-                Text("Trends for you")
-                    .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, alignment: .leading)
-                    .padding(.leading, 10)
-                    .font(.title3)
-                    .fontWeight(.bold)
             case "community":
                 Text("Discover new communities")
                     .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, alignment: .leading)
