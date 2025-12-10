@@ -26,19 +26,8 @@ struct SearchView: View {
 
             // Content based on search state
             if searchText.isEmpty {
-                // Show trends when not searching
-                VStack(alignment: .leading) {
-                    Text("Trends for you")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading, 10)
-                        .padding(.top, 10)
-                        .font(.title3)
-                        .fontWeight(.bold)
-
-                    ScrollView {
-                        MockTrends()
-                    }
-                }
+                // Show trending/explore view when not searching
+                TrendsView()
             } else {
                 // Show search results
                 if isSearching {
