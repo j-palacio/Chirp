@@ -359,9 +359,9 @@ struct PostRowView: View {
         Task {
             do {
                 if isLiked {
-                    try await postRepository.likePost(postId: post.id, userId: userId)
+                    try await postRepository.likePost(postId: post.id, userId: userId, postAuthorId: post.authorId)
                 } else {
-                    try await postRepository.unlikePost(postId: post.id, userId: userId)
+                    try await postRepository.unlikePost(postId: post.id, userId: userId, postAuthorId: post.authorId)
                 }
             } catch {
                 // Revert on error
@@ -384,9 +384,9 @@ struct PostRowView: View {
         Task {
             do {
                 if isReposted {
-                    try await postRepository.repost(postId: post.id, userId: userId)
+                    try await postRepository.repost(postId: post.id, userId: userId, postAuthorId: post.authorId)
                 } else {
-                    try await postRepository.unrepost(postId: post.id, userId: userId)
+                    try await postRepository.unrepost(postId: post.id, userId: userId, postAuthorId: post.authorId)
                 }
             } catch {
                 // Revert on error

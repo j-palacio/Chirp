@@ -8,18 +8,18 @@
 import SwiftUI
 
 struct NotificationsView: View {
-    
-    @Binding var showMenu : Bool
-    
+    @Binding var showMenu: Bool
+
     var body: some View {
-        VStack(alignment: .center) {
-            //header
+        VStack(spacing: 0) {
+            // Header (includes the tab bar via NotificationsScreenTabs)
             ViewHeader(view: "notification", searchText: .constant(""), showMenu: $showMenu)
-            Divider()
-        }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 
-//#Preview {
-//    NotificationsView()
-//}
+#Preview {
+    NotificationsView(showMenu: .constant(false))
+        .environmentObject(AuthManager())
+}

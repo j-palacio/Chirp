@@ -133,7 +133,7 @@ final class FeedViewModel: ObservableObject {
     /// Like a post
     func likePost(_ post: Post, userId: UUID) async {
         do {
-            try await postRepository.likePost(postId: post.id, userId: userId)
+            try await postRepository.likePost(postId: post.id, userId: userId, postAuthorId: post.authorId)
             // Update local state
             if let index = forYouPosts.firstIndex(where: { $0.id == post.id }) {
                 var updatedPost = forYouPosts[index]
@@ -150,7 +150,7 @@ final class FeedViewModel: ObservableObject {
     /// Unlike a post
     func unlikePost(_ post: Post, userId: UUID) async {
         do {
-            try await postRepository.unlikePost(postId: post.id, userId: userId)
+            try await postRepository.unlikePost(postId: post.id, userId: userId, postAuthorId: post.authorId)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -159,7 +159,7 @@ final class FeedViewModel: ObservableObject {
     /// Repost a post
     func repost(_ post: Post, userId: UUID) async {
         do {
-            try await postRepository.repost(postId: post.id, userId: userId)
+            try await postRepository.repost(postId: post.id, userId: userId, postAuthorId: post.authorId)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -168,7 +168,7 @@ final class FeedViewModel: ObservableObject {
     /// Remove repost
     func unrepost(_ post: Post, userId: UUID) async {
         do {
-            try await postRepository.unrepost(postId: post.id, userId: userId)
+            try await postRepository.unrepost(postId: post.id, userId: userId, postAuthorId: post.authorId)
         } catch {
             errorMessage = error.localizedDescription
         }

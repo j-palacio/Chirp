@@ -70,6 +70,7 @@
 		E1C6BE04A729ED28B2443559 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CBB655B5CE1E6777D11E479 /* EditProfileView.swift */; };
 		E280C2290DBE82814CD8E134 /* ExploreCategoryTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3948069384BE3B07974C3 /* ExploreCategoryTabs.swift */; };
 		FBD2597FB759CC4467389730 /* ProfileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6603BBA61B7D19E58EDBFC /* ProfileRepository.swift */; };
+		A1B2C3D4E5F607890A1B2C3D /* NotificationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F3A4B5C607890D1E2F3A /* NotificationRepository.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -131,6 +132,7 @@
 		8A86D5F5B9CC7B6182CD2D1E /* TrendingTopicRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TrendingTopicRow.swift; path = TrendingTopicRow.swift; sourceTree = "<group>"; };
 		DD6603BBA61B7D19E58EDBFC /* ProfileRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProfileRepository.swift; sourceTree = "<group>"; };
 		E3CB627ECF5E9F51A99325DA /* NewsArticle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NewsArticle.swift; path = NewsArticle.swift; sourceTree = "<group>"; };
+		D1E2F3A4B5C607890D1E2F3A /* NotificationRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationRepository.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -546,6 +548,7 @@
 				1BA47C062EE3F00600A59ACC /* PostRepository.swift */,
 				DD6603BBA61B7D19E58EDBFC /* ProfileRepository.swift */,
 				2EEF6146FA08151356399023 /* TrendsRepository.swift */,
+				D1E2F3A4B5C607890D1E2F3A /* NotificationRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -694,6 +697,7 @@
 				AC8152E265E0BFF4FE98976F /* NewsService.swift in Sources */,
 				D59B5F08FA846376C3ADA2D1 /* TrendsRepository.swift in Sources */,
 				945EAAD119C618E56082AC63 /* NewsArticle.swift in Sources */,
+				A1B2C3D4E5F607890A1B2C3D /* NotificationRepository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

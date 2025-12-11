@@ -4,6 +4,7 @@ import Supabase
 /// Repository for post-related database operations
 final class PostRepository {
     private let supabase = SupabaseManager.shared.client
+    private let notificationRepository = NotificationRepository()
 
     // MARK: - Fetch Posts
 
@@ -130,18 +131,34 @@ final class PostRepository {
 
     // MARK: - Likes
 
-    func likePost(postId: UUID, userId: UUID) async throws {
+    func likePost(postId: UUID, userId: UUID, postAuthorId: UUID) async throws {
         let like = LikeInsert(userId: userId, postId: postId)
         try await supabase.from("likes").insert(like).execute()
+
+        // Create notification for post author
+        try? await notificationRepository.createNotification(
+            userId: postAuthorId,
+            actorId: userId,
+            type: .like,
+            postId: postId
+        )
     }
 
-    func unlikePost(postId: UUID, userId: UUID) async throws {
+    func unlikePost(postId: UUID, userId: UUID, postAuthorId: UUID) async throws {
         try await supabase
             .from("likes")
             .delete()
             .eq("post_id", value: postId)
             .eq("user_id", value: userId)
             .execute()
+
+        // Remove notification
+        try? await notificationRepository.deleteNotification(
+            userId: postAuthorId,
+            actorId: userId,
+            type: .like,
+            postId: postId
+        )
     }
 
     func hasUserLikedPost(postId: UUID, userId: UUID) async throws -> Bool {
@@ -157,18 +174,34 @@ final class PostRepository {
 
     // MARK: - Reposts
 
-    func repost(postId: UUID, userId: UUID) async throws {
+    func repost(postId: UUID, userId: UUID, postAuthorId: UUID) async throws {
         let repost = RepostInsert(userId: userId, postId: postId)
         try await supabase.from("reposts").insert(repost).execute()
+
+        // Create notification for post author
+        try? await notificationRepository.createNotification(
+            userId: postAuthorId,
+            actorId: userId,
+            type: .repost,
+            postId: postId
+        )
     }
 
-    func unrepost(postId: UUID, userId: UUID) async throws {
+    func unrepost(postId: UUID, userId: UUID, postAuthorId: UUID) async throws {
         try await supabase
             .from("reposts")
             .delete()
             .eq("post_id", value: postId)
             .eq("user_id", value: userId)
             .execute()
+
+        // Remove notification
+        try? await notificationRepository.deleteNotification(
+            userId: postAuthorId,
+            actorId: userId,
+            type: .repost,
+            postId: postId
+        )
     }
 
     func hasUserReposted(postId: UUID, userId: UUID) async throws -> Bool {
@@ -204,15 +237,25 @@ final class PostRepository {
             .value
     }
 
-    func createComment(postId: UUID, authorId: UUID, content: String) async throws -> Comment {
+    func createComment(postId: UUID, authorId: UUID, content: String, postAuthorId: UUID) async throws -> Comment {
         let insert = CommentInsert(postId: postId, authorId: authorId, content: content)
-        return try await supabase
+        let comment: Comment = try await supabase
             .from("comments")
             .insert(insert)
             .select("*, profiles(*)")
             .single()
             .execute()
             .value
+
+        // Create notification for post author
+        try? await notificationRepository.createNotification(
+            userId: postAuthorId,
+            actorId: authorId,
+            type: .comment,
+            postId: postId
+        )
+
+        return comment
     }
 
     func deleteComment(commentId: UUID) async throws {
@@ -266,6 +309,14 @@ final class PostRepository {
     func followUser(followerId: UUID, followingId: UUID) async throws {
         let follow = FollowInsert(followerId: followerId, followingId: followingId)
         try await supabase.from("follows").insert(follow).execute()
+
+        // Create notification for the user being followed
+        try? await notificationRepository.createNotification(
+            userId: followingId,
+            actorId: followerId,
+            type: .follow,
+            postId: nil
+        )
     }
 
     func unfollowUser(followerId: UUID, followingId: UUID) async throws {
@@ -275,6 +326,14 @@ final class PostRepository {
             .eq("follower_id", value: followerId)
             .eq("following_id", value: followingId)
             .execute()
+
+        // Remove follow notification
+        try? await notificationRepository.deleteNotification(
+            userId: followingId,
+            actorId: followerId,
+            type: .follow,
+            postId: nil
+        )
     }
 
     func isFollowing(followerId: UUID, followingId: UUID) async throws -> Bool {

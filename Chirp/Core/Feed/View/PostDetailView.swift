@@ -223,7 +223,8 @@ struct PostDetailView: View {
                 let comment = try await postRepository.createComment(
                     postId: post.id,
                     authorId: userId,
-                    content: content
+                    content: content,
+                    postAuthorId: post.authorId
                 )
                 await MainActor.run {
                     comments.append(comment)
